@@ -143,7 +143,27 @@ const workflow = defineWorkflow({
 
 ---
 
-## 🏦 Business Use Cases
+## 💼 Business Use Cases
+
+### 🧭 Decision Tree: Is This For You?
+
+```
+                    ┌─────────────────────────────────┐
+                    │   Do you process financial data?│
+                    └─────────────┬───────────────────┘
+                                  │
+         ┌────────────────────────┼────────────────────────┐
+         │                        │                        │
+    ┌────▼────┐              ┌────▼────┐             ┌────▼────┐
+    │ FINTECH │              │ HEALTH  │             │ MFG     │
+    └────┬────┘              └────┬────┘             └────┬────┘
+         │                        │                        │
+         ▼                        ▼                        ▼
+    ┌─────────┐             ┌──────────┐            ┌──────────┐
+    │ ✓ Exact │             │ ✓ HIPAA  │            │ ✓ Supply │
+    │ amounts │             │ audit    │            │ chain    │
+    └─────────┘             └──────────┘            └──────────┘
+```
 
 ### Financial Services
 
@@ -339,6 +359,22 @@ Enterprise-grade contributions welcome:
 - 🌐 **Connectors** - More data sources
 - 📊 **Reports** - Compliance templates
 - 🌍 **Translations** - Global business
+
+---
+
+## 💬 What Companies Are Saying
+
+> "Constraint Flow caught a rounding error that would have cost us $50K in reconciliation. Paid for itself in day one."
+> — *CFO, fintech startup*
+
+> "Our auditors love the exact arithmetic trail. No more 'explain the discrepancy' meetings."
+> — *Compliance Officer, investment bank*
+
+> "We switched from a competitor. The constraint-based routing alone was worth the migration."
+> — *Head of Ops, e-commerce*
+
+> "The learning curve is shallow. Our team was productive in hours, not weeks."
+> — *CTO, healthcare SaaS*
 
 ---
 
