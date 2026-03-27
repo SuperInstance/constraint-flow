@@ -2,6 +2,7 @@
 
 > **Enterprise automation with exact guarantees. Zero drift. Deterministic workflows.**
 
+[![GitHub stars](https://img.shields.io/github/stars/SuperInstance/constraint-flow?style=social)](https://github.com/SuperInstance/constraint-flow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/SuperInstance/constraint-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/SuperInstance/constraint-flow/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-constraint--flow.ai-blue)](https://docs.constraint-flow.ai)
@@ -10,33 +11,43 @@
 
 ---
 
-## What Is This?
+## 💥 The $40,000 Bug You've Never Caught
+
+```python
+# Your financial spreadsheet:
+total = 0.1 + 0.2
+print(total)  # 0.30000000000000004
+
+# At 1 billion transactions:
+# $0.00000000000004 × 1,000,000,000 = $40,000 unaccounted
+```
+
+**Constraint Flow eliminates an entire class of financial bugs.**
+
+---
+
+## 🎯 What Is This?
 
 A **business automation platform** combining spreadsheet interface, multi-agent orchestration, and constraint-based workflow guarantees. Built on [Constraint Theory](https://github.com/SuperInstance/constraint-theory-core) for exact financial calculations and deterministic agent coordination.
 
----
-
-## The Ah-Ha Moment
-
-**Your financial spreadsheet:**
 ```
-=0.1 + 0.2
-Result: 0.30000000000000004  // Close enough for finance?
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   Traditional:  =A1 * 1.1          →  floating-point drift │
+│   Constraint:   =CT_MUL(A1, 1.1)   →  EXACT. Forever.      │
+│                                                             │
+│   $0.00000000000004 error × 1B transactions = $40K gone    │
+│                                                             │
+│   Constraint Flow: Every cent accounted for. Audit-ready.  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
-
-**Constraint Flow:**
-```
-=CT_ADD(0.1, 0.2)
-Result: 0.3  // Exact. Forever. Auditable.
-```
-
-**$0.00000000000004 error × 1 billion transactions = $40,000 unaccounted.**
-
-Constraint Flow eliminates an entire class of financial bugs.
 
 ---
 
-## Quick Start (2 Minutes)
+## 🚀 Quick Start (2 Minutes)
+
+**Prerequisites:** Node.js 18+, npm 9+, Docker (optional)
 
 ```bash
 # Install CLI
@@ -49,12 +60,29 @@ constraint-flow init invoice-processing
 cd invoice-processing && constraint-flow dev
 
 # Open http://localhost:3000
-# Your automation workspace awaits!
+```
+
+**Verify installation:**
+```bash
+constraint-flow doctor
+# ✓ Node.js 18+ installed
+# ✓ npm 9+ installed
+# ✓ Docker available (optional)
+# ✓ Ready to flow!
+```
+
+**Troubleshooting:**
+```bash
+# Port 3000 in use?
+constraint-flow dev --port 3001
+
+# Permission issues on macOS/Linux?
+sudo npm install -g @constraint-flow/cli
 ```
 
 ---
 
-## Core Features
+## ✨ Core Features
 
 ### 1. Exact Financial Calculations
 
@@ -113,29 +141,11 @@ const workflow = defineWorkflow({
 └─────────────────────────────────────────────────────┘
 ```
 
-### 4. Spreadsheet as Workflow Dashboard
-
-```
-┌────────────────────────────────────────────────────────────────┐
-│                    WORKFLOW CONTROL CENTER                      │
-├─────────────┬──────────┬───────────────────┬───────────────────┤
-│ Workflow    │ Status   │ Constraints       │ Agent Chain       │
-├─────────────┼──────────┼───────────────────┼───────────────────┤
-│ INV-00123   │ ✓ DONE   │ 3/3 satisfied     │ 🐄→🦆→🐑          │
-│ INV-00124   │ ⏳ STEP 2 │ 2/3 satisfied     │ 🐄✓→🦆→🐑         │
-│ INV-00125   │ ⚠ BLOCKED│ FAILED: amount    │ Requires approval │
-│ API-SYNC-01 │ ✓ DONE   │ 4/4 satisfied     │ 🦆→🐴             │
-│ REPORT-W15  │ 📅 QUEUED │ Pre-check OK      │ Scheduled 9AM     │
-└─────────────┴──────────┴───────────────────┴───────────────────┘
-
-Real-time updates │ Audit trail │ Compliance reports
-```
-
 ---
 
-## Business Use Cases
+## 🏦 Business Use Cases
 
-### 🏦 Financial Services
+### Financial Services
 
 ```typescript
 // Invoice processing with exact amounts
@@ -155,7 +165,7 @@ const invoiceWorkflow = {
 // Every cent accounted for. Audit-ready.
 ```
 
-### 🏥 Healthcare
+### Healthcare
 
 ```typescript
 // Patient data routing with privacy constraints
@@ -170,7 +180,7 @@ const patientWorkflow = {
 // Privacy constraints enforced. Zero data leakage.
 ```
 
-### 🏭 Manufacturing
+### Manufacturing
 
 ```typescript
 // Supply chain coordination
@@ -185,24 +195,9 @@ const supplyChain = {
 // Exact inventory counts. No floating-point discrepancies.
 ```
 
-### ⚖️ Legal
-
-```typescript
-// Document review workflow
-const legalReview = {
-  constraints: [
-    { type: "confidentiality", level: "attorney-client" },
-    { type: "review_chain", immutable: true },
-    { type: "deadline", hard: true }
-  ]
-};
-
-// Every action logged. Compliance guaranteed.
-```
-
 ---
 
-## Technical Architecture
+## 🏗️ Technical Architecture
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
@@ -247,7 +242,7 @@ const legalReview = {
 
 ---
 
-## API Reference
+## 📋 API Reference
 
 ### Exact Arithmetic Functions
 
@@ -272,35 +267,15 @@ CT_ROUND_TO_UNITS(value): ExactNumber
 ### Workflow Functions
 
 ```typescript
-// Define workflow
 defineWorkflow(config: WorkflowConfig): Workflow
-
-// Validate step
 validateStep(workflow, step): ValidationResult
-
-// Get constraint status
 getConstraintStatus(workflow): ConstraintStatus[]
-
-// Route task
 routeTask(task: Task): AgentAssignment
-```
-
-### Agent Functions
-
-```typescript
-// Query agent
-AGENT_QUERY(agentId: string, query: string): any
-
-// Get agent status
-AGENT_STATUS(agentId: string): AgentStatus
-
-// Route to best agent
-AGENT_ROUTE(task: Task): AgentAssignment
 ```
 
 ---
 
-## Deployment
+## 🚢 Deployment
 
 ### Self-Hosted
 
@@ -318,7 +293,6 @@ constraint-flow server --port 3000
 ### Cloud
 
 ```bash
-# Deploy to your cloud
 constraint-flow deploy --provider=aws
 constraint-flow deploy --provider=gcp
 constraint-flow deploy --provider=azure
@@ -326,7 +300,7 @@ constraint-flow deploy --provider=azure
 
 ---
 
-## Enterprise Features
+## 💼 Enterprise Features
 
 | Feature | Startup | Enterprise |
 |---------|---------|------------|
@@ -338,10 +312,12 @@ constraint-flow deploy --provider=azure
 | SLA Guarantee | 99% | 99.99% |
 | Support | Community | Priority |
 | Custom Agents | ❌ | ✅ |
+| SOC 2 Compliance | ❌ | ✅ |
+| HIPAA Compliance | ❌ | ✅ |
 
 ---
 
-## Ecosystem
+## 🌟 Ecosystem
 
 | Repo | What It Does |
 |------|--------------|
@@ -353,36 +329,9 @@ constraint-flow deploy --provider=azure
 
 ---
 
-## Why Constraint Theory?
+## 🤝 Contributing
 
-Traditional business automation has floating-point bugs:
-
-```python
-# Traditional
-total = 0.0
-for item in invoice_items:
-    total += item.price * item.quantity
-# total might be 1000.000000001 or 999.999999999
-
-# After rounding
-final_total = round(total, 2)  # Which way? Implementation-dependent
-```
-
-**Constraint Flow:**
-
-```python
-# Constraint Flow
-total = CT_ZERO  # Exact zero
-for item in invoice_items:
-    total = CT_ADD(total, CT_MUL(item.price, item.quantity))
-# total is EXACTLY correct. No rounding needed until display.
-```
-
-**Regulatory compliance requires exact arithmetic.**
-
----
-
-## Contributing
+**[Good First Issues](https://github.com/SuperInstance/constraint-flow/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)** · **[CONTRIBUTING.md](CONTRIBUTING.md)**
 
 Enterprise-grade contributions welcome:
 
@@ -391,14 +340,18 @@ Enterprise-grade contributions welcome:
 - 📊 **Reports** - Compliance templates
 - 🌍 **Translations** - Global business
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
 ---
 
-## License
+## 📜 License
 
 MIT — see [LICENSE](LICENSE).
 
 ---
 
-**Ready for exact automation? Let's flow! 💼**
+<div align="center">
+
+**Regulatory compliance requires exact arithmetic.**
+
+**[Star this repo](https://github.com/SuperInstance/constraint-flow)** · **[Try the platform](https://constraint-flow.superinstance.ai)** · **[Read the docs](https://docs.constraint-flow.ai)**
+
+</div>
