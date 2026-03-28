@@ -50,16 +50,24 @@ A **business automation platform** combining spreadsheet interface, multi-agent 
 **Prerequisites:** Node.js 18+, npm 9+, Docker (optional)
 
 ```bash
-# Install CLI
+# Install CLI globally
 npm install -g @constraint-flow/cli
 
-# Create new workflow
+# Create new workflow project
 constraint-flow init invoice-processing
 
-# Start local server
+# Start local development server
 cd invoice-processing && constraint-flow dev
 
 # Open http://localhost:3000
+```
+
+**Alternative: Use without global install**
+```bash
+# Using npx (no global install needed)
+npx @constraint-flow/cli init invoice-processing
+cd invoice-processing
+npx constraint-flow dev
 ```
 
 **Verify installation:**
@@ -71,13 +79,17 @@ constraint-flow doctor
 # ✓ Ready to flow!
 ```
 
-**Troubleshooting:**
+**Common Issues:**
 ```bash
 # Port 3000 in use?
 constraint-flow dev --port 3001
 
 # Permission issues on macOS/Linux?
 sudo npm install -g @constraint-flow/cli
+
+# Node version too old?
+nvm install 18
+nvm use 18
 ```
 
 ---
@@ -266,23 +278,60 @@ const supplyChain = {
 
 ### Exact Arithmetic Functions
 
+Constraint Flow uses exact arithmetic powered by [constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core) to eliminate floating-point errors in financial calculations.
+
 ```typescript
-// Basic operations
-CT_ADD(a, b): ExactNumber
-CT_SUB(a, b): ExactNumber
-CT_MUL(a, b): ExactNumber
-CT_DIV(a, b): ExactNumber
+// Basic operations - no floating-point drift
+CT_ADD(a, b): ExactNumber        // Exact addition: CT_ADD(0.1, 0.2) = 0.3 (exact!)
+CT_SUB(a, b): ExactNumber        // Exact subtraction
+CT_MUL(a, b): ExactNumber        // Exact multiplication: CT_MUL(0.1, 3) = 0.3 (exact!)
+CT_DIV(a, b): ExactNumber        // Exact division with remainder tracking
 
-// Aggregations
-CT_SUM(range): ExactNumber
-CT_AVERAGE(range): ExactNumber
-CT_FINANCIAL_SUM(range): ExactNumber  // No cumulative error
+// Aggregations - zero cumulative error
+CT_SUM(range): ExactNumber       // Sum without accumulating errors
+CT_AVERAGE(range): ExactNumber   // Precise average
+CT_FINANCIAL_SUM(range): ExactNumber  // Regulatory-compliant sum
 
-// Rounding
-CT_ROUND(value, precision): ExactNumber
-CT_ROUND_TO_CENTS(value): ExactNumber
-CT_ROUND_TO_UNITS(value): ExactNumber
+// Rounding - auditor-approved
+CT_ROUND(value, precision): ExactNumber   // Round to specified precision
+CT_ROUND_TO_CENTS(value): ExactNumber     // Round to 2 decimal places
+CT_ROUND_TO_UNITS(value): ExactNumber     // Round to whole units
+CT_ROUND_HALF_EVEN(value, precision): ExactNumber  // Banker's rounding
 ```
+
+**Why this matters:**
+```typescript
+// Traditional JavaScript
+const total = 0.1 + 0.2;  // 0.30000000000000004 ❌
+
+// Constraint Flow exact arithmetic
+const total = CT_ADD(0.1, 0.2);  // 0.3 EXACTLY ✓
+
+// Large aggregations
+const sum = CT_SUM([0.1, 0.1, 0.1, 0.1, 0.1]);  // 0.5 EXACTLY ✓
+// vs JavaScript: 0.49999999999999994 ❌
+```
+
+### Constraint Types Reference
+
+| Type | Description | Example |
+|------|-------------|----------|
+| `amount_limit` | Maximum value constraint | `{ type: 'amount_limit', max: 10000 }` |
+| `amount_range` | Min/max value bounds | `{ type: 'amount_range', min: 100, max: 50000 }` |
+| `exact_precision` | Force exact arithmetic | `{ type: 'exact_precision', precision: 'cents' }` |
+| `time_limit` | SLA time constraint | `{ type: 'time_limit', maxHours: 24 }` |
+| `business_hours` | Only execute 9-5 | `{ type: 'business_hours' }` |
+| `weekdays_only` | No weekend execution | `{ type: 'weekdays_only' }` |
+| `approval_required` | Always need approval | `{ type: 'approval_required' }` |
+| `conditional_approval` | Approval based on condition | `{ type: 'conditional_approval', when: { '>': 5000 } }` |
+| `multi_approval` | Multiple approvers needed | `{ type: 'multi_approval', count: 2 }` |
+| `balanced_workload` | Distribute work evenly | `{ type: 'balanced_workload' }` |
+| `no_cycles` | Prevent circular dependencies | `{ type: 'no_cycles' }` |
+| `min_parallelism` | Minimum parallel tasks | `{ type: 'min_parallelism', n: 3 }` |
+| `max_latency` | Maximum response time | `{ type: 'max_latency', ms: 5000 }` |
+| `audit_trail` | Immutable audit log | `{ type: 'audit_trail', required: true }` |
+| `hipaa_compliant` | HIPAA data handling | `{ type: 'hipaa_compliant', required: true }` |
+| `data_locality` | Regional data storage | `{ type: 'data_locality', region: 'US' }` |
 
 ### Workflow Functions
 
@@ -341,17 +390,65 @@ constraint-flow deploy --provider=azure
 
 | Repo | What It Does |
 |------|--------------|
-| **[constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core)** | Rust crate - exact arithmetic |
-| **[constraint-theory-python](https://github.com/SuperInstance/constraint-theory-python)** | Python bindings |
-| **[constraint-ranch](https://github.com/SuperInstance/constraint-ranch)** | Gamified AI training |
-| **[constraint-flow](https://github.com/SuperInstance/constraint-flow)** | This repo - Business automation |
-| **[pasture-ai](https://github.com/SuperInstance/pasture-ai)** | Production agent system |
+| **[constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core)** | Rust crate - exact arithmetic, Pythagorean snapping, deterministic geometry |
+| **[constraint-theory-python](https://github.com/SuperInstance/constraint-theory-python)** | Python bindings - PyTorch integration, ML quantization |
+| **[constraint-ranch](https://github.com/SuperInstance/constraint-ranch)** | Gamified AI training - puzzle-based agent coordination |
+| **[constraint-flow](https://github.com/SuperInstance/constraint-flow)** | This repo - Enterprise workflow automation with exact guarantees |
+| **[constraint-theory-web](https://github.com/SuperInstance/constraint-theory-web)** | Interactive demos - 49 visual experiments |
+| **[constraint-theory-research](https://github.com/SuperInstance/constraint-theory-research)** | Research papers - mathematical foundations |
+
+### Ecosystem Integration
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    CONSTRAINT ECOSYSTEM INTEGRATION                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  constraint-theory-core (Rust)                                           │
+│       │                                                                  │
+│       │ Exact arithmetic, Pythagorean snapping, holonomy checking       │
+│       ▼                                                                  │
+│  constraint-theory-python ◄───► constraint-flow                          │
+│       │                            │                                     │
+│       │ PyTorch integration        │ TypeScript workflows                │
+│       │ ML quantization            │ Business automation                 │
+│       ▼                            ▼                                     │
+│  ┌─────────────────────────────────────────────────────────────┐        │
+│  │                    constraint-ranch                          │        │
+│  │         Gamified training for constraint-aware agents        │        │
+│  └─────────────────────────────────────────────────────────────┘        │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Quick Reference
+
+| What You Need | Where to Go |
+|---------------|-------------|
+| Exact arithmetic | `CT_ADD()`, `CT_SUM()` from constraint-theory-core |
+| Agent training | [constraint-ranch](https://github.com/SuperInstance/constraint-ranch) |
+| ML integration | [constraint-theory-python](https://github.com/SuperInstance/constraint-theory-python) |
+| Workflow patterns | [WORKFLOW_PATTERNS.md](docs/WORKFLOW_PATTERNS.md) |
+| Enterprise features | [ENTERPRISE.md](docs/ENTERPRISE.md) |
+| Ecosystem guide | [ECOSYSTEM.md](docs/ECOSYSTEM.md) |
+
+### Integration Examples
+
+**Using constraint-theory-core from Constraint Flow:**
+```typescript
+import { PythagoreanManifold, snap } from '@constraint-flow/core';
+
+// These are powered by constraint-theory-core under the hood
+const manifold = new PythagoreanManifold(200);
+const [exact, noise] = manifold.snap([0.577, 0.816]);
+// exact = [0.6, 0.8] = (3/5, 4/5) - EXACT PYTHAGOREAN TRIPLE
+```
 
 ---
 
 ## 🤝 Contributing
 
-**[Good First Issues](https://github.com/SuperInstance/constraint-flow/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)** · **[CONTRIBUTING.md](CONTRIBUTING.md)**
+**[Good First Issues](https://github.com/SuperInstance/constraint-flow/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)** · **[CONTRIBUTING.md](CONTRIBUTING.md)** · **[ONBOARDING.md](ONBOARDING.md)**
 
 Enterprise-grade contributions welcome:
 
@@ -359,6 +456,18 @@ Enterprise-grade contributions welcome:
 - 🌐 **Connectors** - More data sources
 - 📊 **Reports** - Compliance templates
 - 🌍 **Translations** - Global business
+- 🧪 **Test Coverage** - Edge cases, integration tests
+- 📚 **Documentation** - Tutorials, API reference
+
+### Development Setup
+
+```bash
+git clone https://github.com/SuperInstance/constraint-flow.git
+cd constraint-flow
+npm install
+npm run build
+npm test
+```
 
 ---
 

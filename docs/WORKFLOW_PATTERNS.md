@@ -1164,9 +1164,364 @@ describe('workflow constraints', () => {
 
 ---
 
+## Error Handling Deep Dive
+
+### Error Types
+
+Constraint Flow provides typed errors for different failure scenarios:
+
+```typescript
+import {
+  WorkflowError,
+  ConstraintViolationError,
+  StepExecutionError,
+  TimeoutError,
+  CompensationError,
+  ValidationError
+} from 'constraint-flow';
+
+// Error hierarchy
+try {
+  await engine.execute(workflow, input);
+} catch (error) {
+  if (error instanceof ConstraintViolationError) {
+    console.error('Constraint violated:', error.constraintType);
+    console.error('Constraint config:', error.config);
+    console.error('At step:', error.stepId);
+  } else if (error instanceof StepExecutionError) {
+    console.error('Step failed:', error.stepId);
+    console.error('Operation:', error.operation);
+    console.error('Original error:', error.cause);
+  } else if (error instanceof TimeoutError) {
+    console.error('Timed out at:', error.stepId);
+    console.error('Timeout after:', error.timeoutMs);
+  } else if (error instanceof CompensationError) {
+    console.error('Compensation failed for step:', error.stepId);
+    console.error('Compensation error:', error.compensationError);
+  }
+}
+```
+
+### Comprehensive Error Handling Pattern
+
+```typescript
+const resilientWorkflow = defineWorkflow({
+  name: 'payment-processing',
+  
+  steps: [
+    // ... steps
+  ],
+  
+  errorHandling: {
+    // Global error handling strategy
+    strategy: 'compensate',  // 'compensate' | 'continue' | 'abort'
+    
+    // Error-specific handlers
+    onError: [
+      {
+        // Match specific error types
+        error: 'PaymentDeclinedError',
+        steps: ['notify-declined', 'log-fraud-check'],
+        retry: false,  // Don't retry declined payments
+      },
+      {
+        // Network errors with retry
+        error: 'NetworkError',
+        steps: ['log-network-issue'],
+        retry: {
+          maxAttempts: 3,
+          backoff: 'exponential',
+          baseDelayMs: 1000,
+          maxDelayMs: 30000,
+        },
+      },
+      {
+        // Rate limiting
+        error: 'RateLimitError',
+        steps: ['wait-and-retry'],
+        retry: {
+          maxAttempts: 5,
+          backoff: 'linear',
+          baseDelayMs: 60000,  // Wait 1 minute
+        },
+      },
+      {
+        // Catch-all for unexpected errors
+        error: '*',
+        steps: ['log-error', 'notify-oncall'],
+        retry: {
+          maxAttempts: 1,
+        },
+      },
+    ],
+    
+    // Global retry defaults
+    defaultRetry: {
+      maxAttempts: 2,
+      backoff: 'exponential',
+      baseDelayMs: 500,
+    },
+    
+    // Timeout handling
+    onTimeout: {
+      steps: ['escalate-timeout'],
+      notify: ['#ops-alerts'],
+    },
+  },
+  
+  // Compensation actions
+  compensation: {
+    'reserve-inventory': {
+      connector: 'erp',
+      operation: 'releaseInventory',
+      input: { reservationId: '${result.reservationId}' },
+    },
+    'charge-payment': {
+      connector: 'payment',
+      operation: 'refund',
+      input: { transactionId: '${result.transactionId}' },
+    },
+  },
+});
+```
+
+### Step-Level Error Handling
+
+```typescript
+const workflowWithStepErrors = defineWorkflow({
+  name: 'mixed-criticality-workflow',
+  
+  steps: [
+    {
+      id: 'critical-step',
+      connector: 'payment',
+      operation: 'charge',
+      input: { /* ... */ },
+      
+      // Step-level error handling (overrides workflow-level)
+      errorHandling: {
+        retry: {
+          maxAttempts: 5,
+          backoff: 'exponential',
+        },
+        fallback: {
+          // Try alternative if primary fails
+          connector: 'payment-backup',
+          operation: 'charge',
+          input: { /* ... */ },
+        },
+      },
+    },
+    
+    {
+      id: 'optional-notification',
+      connector: 'sendgrid',
+      operation: 'send',
+      input: { /* ... */ },
+      
+      // Non-critical step - failures don't fail the workflow
+      optional: true,
+      
+      errorHandling: {
+        retry: {
+          maxAttempts: 1,
+        },
+        // Ignore errors for this step
+        ignoreErrors: true,
+      },
+    },
+  ],
+});
+```
+
+### Circuit Breaker Integration
+
+```typescript
+const workflowWithCircuitBreaker = defineWorkflow({
+  name: 'external-api-calls',
+  
+  steps: [
+    {
+      id: 'call-external-api',
+      connector: 'external-service',
+      operation: 'getData',
+      
+      circuitBreaker: {
+        // Open circuit after 5 failures
+        failureThreshold: 5,
+        // Try to recover after 1 minute
+        resetTimeout: 60000,
+        // Use cached data when circuit is open
+        fallback: {
+          connector: 'cache',
+          operation: 'get',
+          input: { key: 'fallback:${input.resourceId}' },
+        },
+        // Monitor circuit state
+        onStateChange: {
+          open: {
+            notify: ['#ops-alerts'],
+            log: true,
+          },
+          close: {
+            notify: ['#ops-alerts'],
+          },
+        },
+      },
+    },
+  ],
+});
+```
+
+---
+
+## Testing Workflows
+
+### Unit Testing Constraints
+
+```typescript
+import { WorkflowValidator } from 'constraint-flow';
+
+describe('invoice workflow constraints', () => {
+  let validator: WorkflowValidator;
+  
+  beforeAll(() => {
+    validator = new WorkflowValidator(invoiceWorkflow);
+  });
+  
+  it('should enforce amount limit', () => {
+    const result = validator.validateConstraints({
+      amount: 15000,
+    });
+    
+    expect(result.valid).toBe(false);
+    expect(result.violations).toContainEqual(
+      expect.objectContaining({
+        type: 'amount_limit',
+        message: expect.stringContaining('$10,000'),
+      })
+    );
+  });
+  
+  it('should enforce exact precision', () => {
+    const result = validator.validateConstraints({
+      amount: 100.999,  // Invalid precision
+    });
+    
+    expect(result.valid).toBe(false);
+    expect(result.violations).toContainEqual(
+      expect.objectContaining({ type: 'exact_precision' })
+    );
+  });
+  
+  it('should pass valid input', () => {
+    const result = validator.validateConstraints({
+      amount: 5000,
+      vendorId: 'VND-001',
+    });
+    
+    expect(result.valid).toBe(true);
+  });
+});
+```
+
+### Integration Testing
+
+```typescript
+import { WorkflowEngine, MockConnector } from 'constraint-flow/testing';
+
+describe('invoice workflow integration', () => {
+  let engine: WorkflowEngine;
+  let mockERP: MockConnector;
+  let mockPayment: MockConnector;
+  
+  beforeAll(async () => {
+    mockERP = new MockConnector('erp');
+    mockPayment = new MockConnector('payment');
+    
+    engine = new WorkflowEngine({
+      connectors: [mockERP, mockPayment],
+    });
+    
+    await engine.register(invoiceWorkflow);
+  });
+  
+  it('should process valid invoice', async () => {
+    const result = await engine.execute('invoice-approval', {
+      invoice: {
+        invoiceId: 'INV-001',
+        amount: 500,
+        vendorId: 'VND-001',
+      },
+    });
+    
+    expect(result.success).toBe(true);
+    expect(result.status).toBe('approved');
+  });
+  
+  it('should trigger compensation on failure', async () => {
+    // Configure mock to fail
+    mockPayment.setError('charge', new Error('Insufficient funds'));
+    
+    const result = await engine.execute('invoice-approval', {
+      invoice: { /* ... */ },
+    });
+    
+    expect(result.success).toBe(false);
+    expect(result.compensated).toBe(true);
+    expect(mockERP.calls).toContainEqual(
+      expect.objectContaining({ operation: 'releaseInventory' })
+    );
+  });
+});
+```
+
+### Testing Exact Arithmetic
+
+```typescript
+import { ExactNumber, CT_SUM } from 'constraint-flow';
+
+describe('exact arithmetic', () => {
+  it('should handle 0.1 + 0.2 exactly', () => {
+    const a = ExactNumber.fromFloat(0.1);
+    const b = ExactNumber.fromFloat(0.2);
+    const sum = a.add(b);
+    
+    expect(sum.toFloat()).toBe(0.3);
+    expect(sum.toFloat()).not.toBe(0.30000000000000004);
+  });
+  
+  it('should sum arrays without cumulative error', () => {
+    const values = Array(10).fill(0.1);
+    const sum = CT_SUM(values);
+    
+    expect(sum.toFloat()).toBe(1.0);
+    // Compare with JavaScript:
+    expect(values.reduce((a, b) => a + b)).not.toBe(1.0);
+  });
+});
+```
+
+---
+
 ## Need Help?
 
 - 📖 [Connector Development Guide](./CONNECTORS.md)
 - 📋 [Example Templates](../templates/)
+- 🎮 [Ranch Integration Guide](./RANCH_INTEGRATION.md) - Agent training and coordination
 - 💬 [GitHub Discussions](https://github.com/SuperInstance/constraint-flow/discussions)
 - 🐛 [Report Issues](https://github.com/SuperInstance/constraint-flow/issues)
+
+---
+
+## Agent Coordination from constraint-ranch
+
+Many coordination patterns in Constraint Flow are trained and refined using [constraint-ranch](https://github.com/SuperInstance/constraint-ranch). Key patterns include:
+
+| Pattern | Ranch Training | Flow Application |
+|---------|----------------|------------------|
+| Border Collie (Master-Worker) | Spatial routing puzzles | Task distribution |
+| Herding (Broadcast-Collect) | Consensus games | Multi-agent voting |
+| Flocking (Swarm) | Coordination challenges | Collaborative decisions |
+
+See the [Ranch Integration Guide](./RANCH_INTEGRATION.md) for detailed documentation.
