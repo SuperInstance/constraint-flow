@@ -471,22 +471,6 @@ npm test
 
 ---
 
-## 💬 What Companies Are Saying
-
-> "Constraint Flow caught a rounding error that would have cost us $50K in reconciliation. Paid for itself in day one."
-> — *CFO, fintech startup*
-
-> "Our auditors love the exact arithmetic trail. No more 'explain the discrepancy' meetings."
-> — *Compliance Officer, investment bank*
-
-> "We switched from a competitor. The constraint-based routing alone was worth the migration."
-> — *Head of Ops, e-commerce*
-
-> "The learning curve is shallow. Our team was productive in hours, not weeks."
-> — *CTO, healthcare SaaS*
-
----
-
 ## 📜 License
 
 MIT — see [LICENSE](LICENSE).
