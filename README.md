@@ -7,7 +7,7 @@
 [![CI](https://github.com/SuperInstance/constraint-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/SuperInstance/constraint-flow/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-constraint--flow.ai-blue)](https://docs.constraint-flow.ai)
 
-🌐 **Platform:** [constraint-flow.superinstance.ai](https://constraint-flow.superinstance.ai)
+🌐 **Platform:** [constraint-theory-web.pages.dev](https://constraint-theory-web.pages.dev)
 
 ---
 
@@ -481,6 +481,6 @@ MIT — see [LICENSE](LICENSE).
 
 **Regulatory compliance requires exact arithmetic.**
 
-**[Star this repo](https://github.com/SuperInstance/constraint-flow)** · **[Try the platform](https://constraint-flow.superinstance.ai)** · **[Read the docs](https://docs.constraint-flow.ai)**
+**[Star this repo](https://github.com/SuperInstance/constraint-flow)** · **[Try the platform](https://constraint-theory-web.pages.dev)** · **[Read the docs](https://docs.constraint-flow.ai)**
 
 </div>
