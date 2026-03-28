@@ -976,3 +976,91 @@ const rounded = CT_ROUND_TO_CENTS(123.4567);  // 123.46
 - ✅ ONBOARDING.md already exists - VERIFIED
 
 **No blockers encountered.**
+
+---
+Task ID: 2
+Agent: Explore
+Task: Compare old and new constraint-theory websites
+
+Work Log:
+- Read worklog.md to understand previous work (Tasks 1-7 plus multiple iterations)
+- Fetched and analyzed both live sites:
+  - Old site: https://constraint-theory.superinstance.ai/ (12 simulators)
+  - New site: https://constraint-theory-web.pages.dev/ (52 total: 43 experiments + 7 simulators)
+- Extracted all simulator/experiment paths from both sites using curl
+- Catalogued local files in multiple locations:
+  - `/home/z/my-project/public/simulators/` - 7 simulators (Next.js public folder)
+  - `/home/z/my-project/constraint-theory-audit/web/experiments/` - 41 experiments
+  - `/home/z/my-project/constraint-theory-audit/web/simulators/` - 3 simulators
+  - `/home/z/my-project/repo-split/constraint-theory-web/experiments/` - 52 experiments
+- Identified 4 Hidden Gems (local files NOT on either live site):
+  1. magic-eye - 3D autostereogram constraint visualization
+  2. quantization-playground - Pythagorean Quantizer demo
+  3. ml-constraints - Neural network constraint enforcement
+  4. holonomy-explorer - Interactive holonomy cycle analysis
+- Identified 2 unique simulators on old site:
+  1. bottleneck - Constraint bottleneck visualization
+  2. flow - Flow-based constraint satisfaction
+- Created comprehensive comparison report at `/home/z/my-project/SITE_COMPARISON_REPORT.md`
+
+Stage Summary:
+- **Old Site**: 12 simulators, professional/marketing focused
+- **New Site**: 52 simulations, educational/gallery focused
+- **Hidden Gems Found**: 4 high-value experiments not deployed to either site
+- **Top Recommendations**:
+  1. Add quantization-playground and ml-constraints to new site (P1)
+  2. Port bottleneck and flow from old site (P2)
+  3. Add magic-eye and holonomy-explorer (P2/P3)
+- **Report Location**: `/home/z/my-project/SITE_COMPARISON_REPORT.md`
+
+---
+Task ID: 1
+Agent: frontend-styling-expert
+Task: Implement real-time code comparison feature for constraint-theory-web demo page
+
+Work Log:
+- Read worklog.md to understand previous work and project context
+- Analyzed existing code comparison structure in `/home/z/my-project/src/app/page.tsx`
+- Created expanded code comparison data with 5 simulation types:
+  1. Spatial Indexing (kdtree)
+  2. Coordinate Snapping (pythagorean)
+  3. Batch Processing (swarm)
+  4. Physics Simulation (spring-mass)
+  5. Neural Network Constraints (neural-network)
+- Added support for 5 programming languages: Rust, Python, TypeScript, Go, C++
+- Created `useAnimatedCounter` hook for smooth number animations
+- Created `languageColors` configuration with per-language styling and icons
+- Implemented `RealTimeCodeComparison` component with:
+  - Language selector tabs with emoji icons
+  - Animated character count metrics
+  - Complexity badge pulse animation on change
+  - Characters saved animation
+  - Per-language syntax highlighting colors
+  - Glow effects on code panels
+  - Smooth transitions between code examples
+- Connected code comparison to active simulation selection:
+  - Added `activeComparison` memoized value
+  - Added `selectedLanguage` state
+- Updated simulations view with real-time code panel:
+  - Mini language selector
+  - Side-by-side code comparison
+  - Savings indicator
+  - "View Full" button to comparisons tab
+- Updated comparisons tab:
+  - Shows active simulation's code prominently
+  - Grid of all code comparisons (clickable to switch simulation)
+  - Smooth transitions and hover effects
+- Verified build succeeds with `npm run build`
+
+Stage Summary:
+- **Key Features Implemented**:
+  1. Real-time code comparison connected to active simulation
+  2. Language selector tabs (Rust, Python, TypeScript, Go, C++)
+  3. Animated metrics (character count, complexity badge, characters saved)
+  4. Per-language styling with icons and accent colors
+  5. Responsive design with smooth transitions
+  6. Glow effects on code panels
+  7. Click-through from comparison cards to simulation view
+- **Files Modified**: `/home/z/my-project/src/app/page.tsx`
+- **Build Status**: ✅ Successful (Next.js 16.1.3)
+

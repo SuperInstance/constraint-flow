@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/SuperInstance/constraint-theory-python/actions/workflows/ci.yml/badge.svg)](https://github.com/SuperInstance/constraint-theory-python/actions/workflows/ci.yml)
 
-**📦 [Install from PyPI](https://pypi.org/project/constraint-theory/)** | **🌐 [Live Demos](https://constraint-theory.superinstance.ai)** | **📚 [Documentation](https://github.com/SuperInstance/constraint-theory-core)**
+**📦 [Install from PyPI](https://pypi.org/project/constraint-theory/)** | **🌐 [Live Demos](https://constraint-theory-web.pages.dev)** | **📚 [Documentation](https://github.com/SuperInstance/constraint-theory-core)**
 
 ---
 
@@ -366,6 +366,6 @@ MIT — see [LICENSE](LICENSE).
 
 **If your simulation gives different results on laptop vs. cluster, Constraint Theory fixes an entire debugging class.**
 
-**[Star this repo](https://github.com/SuperInstance/constraint-theory-python)** · **[Try the demos](https://constraint-theory.superinstance.ai)**
+**[Star this repo](https://github.com/SuperInstance/constraint-theory-python)** · **[Try the demos](https://constraint-theory-web.pages.dev)**
 
 </div>

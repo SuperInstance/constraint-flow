@@ -302,6 +302,6 @@ MIT — see [LICENSE](LICENSE).
 
 **From "it works" to "here's why it works."**
 
-**[Star this repo](https://github.com/SuperInstance/constraint-theory-research)** · **[Read the paper](https://arxiv.org/abs/2503.15847)** · **[Try the demos](https://constraint-theory.superinstance.ai)**
+**[Star this repo](https://github.com/SuperInstance/constraint-theory-research)** · **[Read the paper](https://arxiv.org/abs/2503.15847)** · **[Try the demos](https://constraint-theory-web.pages.dev)**
 
 </div>

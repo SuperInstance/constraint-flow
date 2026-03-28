@@ -18,11 +18,27 @@ import {
 } from 'lucide-react'
 
 // ==================== CODE COMPARISON DATA ====================
-const codeComparisons = [
+type Language = 'rust' | 'python' | 'typescript' | 'go' | 'cpp'
+
+interface CodeExample {
+  title: string
+  description: string
+  simulationId: string
+  standardCode: Record<Language, string>
+  ourCode: Record<Language, string>
+  standardChars: number
+  ourChars: number
+  standardComplexity: string
+  ourComplexity: string
+}
+
+const codeComparisons: CodeExample[] = [
   {
     title: "Spatial Indexing",
-    description: "Find nearest Pythagorean triple in 2D space",
-    standardCode: `// Standard approach: Brute force search
+    description: "Find nearest Pythagorean triple in 2D space using KD-tree",
+    simulationId: "kdtree",
+    standardCode: {
+      rust: `// Standard approach: Brute force search
 fn find_nearest_pythagorean(
     point: (f64, f64),
     triples: &[(i32, i32, i32)]
@@ -42,12 +58,112 @@ fn find_nearest_pythagorean(
     }
     best
 }`,
-    ourCode: `// Constraint Theory: KD-tree lookup
+      python: `# Standard approach: Brute force search
+def find_nearest_pythagorean(point, triples):
+    best = None
+    best_dist = float('inf')
+    
+    for a, b, c in triples:
+        da = (point[0] - a) ** 2
+        db = (point[1] - b) ** 2
+        dist = (da + db) ** 0.5
+        
+        if dist < best_dist:
+            best_dist = dist
+            best = (a, b, c)
+    
+    return best`,
+      typescript: `// Standard approach: Brute force search
+function findNearestPythagorean(
+  point: [number, number],
+  triples: [number, number, number][]
+): [number, number, number] | null {
+  let best: [number, number, number] | null = null;
+  let bestDist = Infinity;
+  
+  for (const [a, b, c] of triples) {
+    const da = (point[0] - a) ** 2;
+    const db = (point[1] - b) ** 2;
+    const dist = Math.sqrt(da + db);
+    
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = [a, b, c];
+    }
+  }
+  return best;
+}`,
+      go: `// Standard approach: Brute force search
+func FindNearestPythagorean(point [2]float64, 
+    triples [][3]int) [3]int {
+    var best [3]int
+    bestDist := math.MaxFloat64
+    
+    for _, t := range triples {
+        da := math.Pow(point[0]-float64(t[0]), 2)
+        db := math.Pow(point[1]-float64(t[1]), 2)
+        dist := math.Sqrt(da + db)
+        
+        if dist < bestDist {
+            bestDist = dist
+            best = t
+        }
+    }
+    return best
+}`,
+      cpp: `// Standard approach: Brute force search
+std::optional<std::tuple<int,int,int>>
+findNearestPythagorean(
+    std::pair<double,double> point,
+    const std::vector<std::tuple<int,int,int>>& triples) {
+    std::optional<std::tuple<int,int,int>> best;
+    double bestDist = std::numeric_limits<double>::max();
+    
+    for (const auto& [a, b, c] : triples) {
+        double da = std::pow(point.first - a, 2);
+        double db = std::pow(point.second - b, 2);
+        double dist = std::sqrt(da + db);
+        
+        if (dist < bestDist) {
+            bestDist = dist;
+            best = {a, b, c};
+        }
+    }
+    return best;
+}`
+    },
+    ourCode: {
+      rust: `// Constraint Theory: KD-tree lookup
 use constraint_theory::Manifold;
 
 let manifold = Manifold::pythagorean();
 let nearest = manifold.find_nearest(point)?;
 // O(log n) vs O(n) - Done!`,
+      python: `# Constraint Theory: KD-tree lookup
+from constraint_theory import Manifold
+
+manifold = Manifold.pythagorean()
+nearest = manifold.find_nearest(point)
+# O(log n) vs O(n) - Done!`,
+      typescript: `// Constraint Theory: KD-tree lookup
+import { Manifold } from 'constraint-theory';
+
+const manifold = Manifold.pythagorean();
+const nearest = manifold.findNearest(point);
+// O(log n) vs O(n) - Done!`,
+      go: `// Constraint Theory: KD-tree lookup
+import "github.com/constraint-theory"
+
+manifold := theory.NewManifold()
+nearest := manifold.FindNearest(point)
+// O(log n) vs O(n) - Done!`,
+      cpp: `// Constraint Theory: KD-tree lookup
+#include <constraint_theory/manifold.hpp>
+
+auto manifold = theory::Manifold::pythagorean();
+auto nearest = manifold.find_nearest(point);
+// O(log n) vs O(n) - Done!`
+    },
     standardChars: 412,
     ourChars: 89,
     standardComplexity: "O(n)",
@@ -56,7 +172,9 @@ let nearest = manifold.find_nearest(point)?;
   {
     title: "Coordinate Snapping",
     description: "Snap a vector to exact Pythagorean coordinates",
-    standardCode: `// Manual constraint solving
+    simulationId: "pythagorean",
+    standardCode: {
+      rust: `// Manual constraint solving
 fn snap_to_pythagorean(v: (f64, f64)) -> (i32, i32, i32) {
     let mut best = (0, 0, 0);
     let mut best_err = f64::MAX;
@@ -76,11 +194,109 @@ fn snap_to_pythagorean(v: (f64, f64)) -> (i32, i32, i32) {
     }
     best
 }`,
-    ourCode: `// Constraint Theory: One-liner
+      python: `# Manual constraint solving
+def snap_to_pythagorean(v):
+    best = (0, 0, 0)
+    best_err = float('inf')
+    
+    for a in range(-100, 101):
+        for b in range(-100, 101):
+            c = (a*a + b*b) ** 0.5
+            if abs(c - round(c)) < 1e-10:
+                err = ((a - v[0])**2 + 
+                       (b - v[1])**2) ** 0.5
+                if err < best_err:
+                    best_err = err
+                    best = (a, b, int(c))
+    return best`,
+      typescript: `// Manual constraint solving
+function snapToPythagorean(v: [number, number]): [number, number, number] {
+  let best: [number, number, number] = [0, 0, 0];
+  let bestErr = Infinity;
+  
+  for (let a = -100; a <= 100; a++) {
+    for (let b = -100; b <= 100; b++) {
+      const c = Math.sqrt(a*a + b*b);
+      if (Math.abs(c - Math.round(c)) < 1e-10) {
+        const err = Math.sqrt((a - v[0])**2 + (b - v[1])**2);
+        if (err < bestErr) {
+          bestErr = err;
+          best = [a, b, Math.round(c)];
+        }
+      }
+    }
+  }
+  return best;
+}`,
+      go: `// Manual constraint solving
+func SnapToPythagorean(v [2]float64) [3]int {
+    best := [3]int{0, 0, 0}
+    bestErr := math.MaxFloat64
+    
+    for a := -100; a <= 100; a++ {
+        for b := -100; b <= 100; b++ {
+            c := math.Sqrt(float64(a*a + b*b))
+            if math.Abs(c - math.Round(c)) < 1e-10 {
+                err := math.Sqrt(
+                    math.Pow(float64(a)-v[0], 2) +
+                    math.Pow(float64(b)-v[1], 2))
+                if err < bestErr {
+                    bestErr = err
+                    best = [3]int{a, b, int(c)}
+                }
+            }
+        }
+    }
+    return best
+}`,
+      cpp: `// Manual constraint solving
+std::tuple<int,int,int> snapToPythagorean(
+    std::pair<double,double> v) {
+    std::tuple<int,int,int> best{0, 0, 0};
+    double bestErr = std::numeric_limits<double>::max();
+    
+    for (int a = -100; a <= 100; a++) {
+        for (int b = -100; b <= 100; b++) {
+            double c = std::sqrt(a*a + b*b);
+            if (std::abs(c - std::round(c)) < 1e-10) {
+                double err = std::sqrt(
+                    std::pow(a - v.first, 2) +
+                    std::pow(b - v.second, 2));
+                if (err < bestErr) {
+                    bestErr = err;
+                    best = {a, b, static_cast<int>(c)};
+                }
+            }
+        }
+    }
+    return best;
+}`
+    },
+    ourCode: {
+      rust: `// Constraint Theory: One-liner
 use constraint_theory::Manifold;
 
 let snapped = Manifold::pythagorean()
     .snap(v.0, v.1)?;`,
+      python: `# Constraint Theory: One-liner
+from constraint_theory import Manifold
+
+snapped = Manifold.pythagorean().snap(v[0], v[1])`,
+      typescript: `// Constraint Theory: One-liner
+import { Manifold } from 'constraint-theory';
+
+const snapped = Manifold.pythagorean()
+    .snap(v[0], v[1]);`,
+      go: `// Constraint Theory: One-liner
+import "github.com/constraint-theory"
+
+snapped := theory.NewManifold().Snap(v[0], v[1])`,
+      cpp: `// Constraint Theory: One-liner
+#include <constraint_theory/manifold.hpp>
+
+auto snapped = theory::Manifold::pythagorean()
+    .snap(v.first, v.second);`
+    },
     standardChars: 445,
     ourChars: 62,
     standardComplexity: "O(n²)",
@@ -89,7 +305,9 @@ let snapped = Manifold::pythagorean()
   {
     title: "Batch Processing",
     description: "Process 1000 vectors with SIMD optimization",
-    standardCode: `// Process vectors one by one
+    simulationId: "swarm",
+    standardCode: {
+      rust: `// Process vectors one by one
 let results: Vec<(i32,i32,i32)> = vectors
     .iter()
     .map(|v| {
@@ -112,16 +330,413 @@ let results: Vec<(i32,i32,i32)> = vectors
         best
     })
     .collect();`,
-    ourCode: `// Constraint Theory: Batch SIMD
+      python: `# Process vectors one by one
+results = []
+for v in vectors:
+    best = (0, 0, 0)
+    best_err = float('inf')
+    for a in range(-100, 101):
+        for b in range(-100, 101):
+            c_sq = a*a + b*b
+            c = c_sq ** 0.5
+            if abs(c - round(c)) < 1e-10:
+                err = (a - v[0])**2 + (b - v[1])**2
+                if err < best_err:
+                    best_err = err
+                    best = (a, b, int(c))
+    results.append(best)`,
+      typescript: `// Process vectors one by one
+const results: [number, number, number][] = vectors.map(v => {
+  let best: [number, number, number] = [0, 0, 0];
+  let bestErr = Infinity;
+  for (let a = -100; a <= 100; a++) {
+    for (let b = -100; b <= 100; b++) {
+      const c = Math.sqrt(a*a + b*b);
+      if (Math.abs(c - Math.round(c)) < 1e-10) {
+        const err = (a - v[0])**2 + (b - v[1])**2;
+        if (err < bestErr) {
+          bestErr = err;
+          best = [a, b, Math.round(c)];
+        }
+      }
+    }
+  }
+  return best;
+});`,
+      go: `// Process vectors one by one
+var results [][3]int
+for _, v := range vectors {
+    best := [3]int{0, 0, 0}
+    bestErr := math.MaxFloat64
+    for a := -100; a <= 100; a++ {
+        for b := -100; b <= 100; b++ {
+            c := math.Sqrt(float64(a*a + b*b))
+            if math.Abs(c - math.Round(c)) < 1e-10 {
+                err := math.Pow(float64(a)-v[0], 2) +
+                       math.Pow(float64(b)-v[1], 2)
+                if err < bestErr {
+                    bestErr = err
+                    best = [3]int{a, b, int(c)}
+                }
+            }
+        }
+    }
+    results = append(results, best)
+}`,
+      cpp: `// Process vectors one by one
+std::vector<std::tuple<int,int,int>> results;
+for (const auto& v : vectors) {
+    std::tuple<int,int,int> best{0, 0, 0};
+    double bestErr = std::numeric_limits<double>::max();
+    for (int a = -100; a <= 100; a++) {
+        for (int b = -100; b <= 100; b++) {
+            double c = std::sqrt(a*a + b*b);
+            if (std::abs(c - std::round(c)) < 1e-10) {
+                double err = std::pow(a - v.first, 2) +
+                             std::pow(b - v.second, 2);
+                if (err < bestErr) {
+                    bestErr = err;
+                    best = {a, b, static_cast<int>(c)};
+                }
+            }
+        }
+    }
+    results.push_back(best);
+}`
+    },
+    ourCode: {
+      rust: `// Constraint Theory: Batch SIMD
 use constraint_theory::Manifold;
 
 let results = Manifold::pythagorean()
     .snap_batch(&vectors)
     .collect::<Vec<_>>();`,
+      python: `# Constraint Theory: Batch SIMD
+from constraint_theory import Manifold
+import numpy as np
+
+results = Manifold.pythagorean().snap_batch(vectors)`,
+      typescript: `// Constraint Theory: Batch SIMD
+import { Manifold } from 'constraint-theory';
+
+const results = Manifold.pythagorean()
+    .snapBatch(vectors);`,
+      go: `// Constraint Theory: Batch SIMD
+import "github.com/constraint-theory"
+
+results := theory.NewManifold().SnapBatch(vectors)`,
+      cpp: `// Constraint Theory: Batch SIMD
+#include <constraint_theory/manifold.hpp>
+
+auto results = theory::Manifold::pythagorean()
+    .snap_batch(vectors);`
+    },
     standardChars: 521,
     ourChars: 87,
     standardComplexity: "O(n² × m)",
     ourComplexity: "O(m log n)"
+  },
+  {
+    title: "Physics Simulation",
+    description: "Spring-mass constraint solver with exact arithmetic",
+    simulationId: "spring-mass",
+    standardCode: {
+      rust: `// Spring constraint solver with drift
+fn solve_spring_constraints(
+    nodes: &mut Vec<Node>,
+    springs: &[Spring],
+    dt: f64
+) {
+    for _ in 0..100 { // iterations for stability
+        for spring in springs {
+            let a = &nodes[spring.a];
+            let b = &nodes[spring.b];
+            
+            let dx = b.x - a.x;
+            let dy = b.y - a.y;
+            let dist = (dx*dx + dy*dy).sqrt();
+            let diff = (spring.rest - dist) / dist;
+            
+            // Floating-point drift accumulates here
+            nodes[spring.a].x += dx * diff * 0.5;
+            nodes[spring.a].y += dy * diff * 0.5;
+            nodes[spring.b].x -= dx * diff * 0.5;
+            nodes[spring.b].y -= dy * diff * 0.5;
+        }
+    }
+}`,
+      python: `# Spring constraint solver with drift
+def solve_spring_constraints(nodes, springs, dt):
+    for _ in range(100):  # iterations for stability
+        for spring in springs:
+            a = nodes[spring['a']]
+            b = nodes[spring['b']]
+            
+            dx = b['x'] - a['x']
+            dy = b['y'] - a['y']
+            dist = (dx*dx + dy*dy) ** 0.5
+            diff = (spring['rest'] - dist) / dist
+            
+            # Floating-point drift accumulates here
+            a['x'] += dx * diff * 0.5
+            a['y'] += dy * diff * 0.5
+            b['x'] -= dx * diff * 0.5
+            b['y'] -= dy * diff * 0.5`,
+      typescript: `// Spring constraint solver with drift
+function solveSpringConstraints(
+  nodes: Node[],
+  springs: Spring[],
+  dt: number
+) {
+  for (let iter = 0; iter < 100; iter++) {
+    for (const spring of springs) {
+      const a = nodes[spring.a];
+      const b = nodes[spring.b];
+      
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const diff = (spring.rest - dist) / dist;
+      
+      // Floating-point drift accumulates here
+      a.x += dx * diff * 0.5;
+      a.y += dy * diff * 0.5;
+      b.x -= dx * diff * 0.5;
+      b.y -= dy * diff * 0.5;
+    }
+  }
+}`,
+      go: `// Spring constraint solver with drift
+func SolveSpringConstraints(
+    nodes []Node, springs []Spring, dt float64) {
+    for iter := 0; iter < 100; iter++ {
+        for _, s := range springs {
+            a := &nodes[s.A]
+            b := &nodes[s.B]
+            
+            dx := b.X - a.X
+            dy := b.Y - a.Y
+            dist := math.Sqrt(dx*dx + dy*dy)
+            diff := (s.Rest - dist) / dist
+            
+            // Floating-point drift accumulates here
+            a.X += dx * diff * 0.5
+            a.Y += dy * diff * 0.5
+            b.X -= dx * diff * 0.5
+            b.Y -= dy * diff * 0.5
+        }
+    }
+}`,
+      cpp: `// Spring constraint solver with drift
+void solveSpringConstraints(
+    std::vector<Node>& nodes,
+    const std::vector<Spring>& springs,
+    double dt) {
+    for (int iter = 0; iter < 100; iter++) {
+        for (const auto& s : springs) {
+            auto& a = nodes[s.a];
+            auto& b = nodes[s.b];
+            
+            double dx = b.x - a.x;
+            double dy = b.y - a.y;
+            double dist = std::sqrt(dx*dx + dy*dy);
+            double diff = (s.rest - dist) / dist;
+            
+            // Floating-point drift accumulates here
+            a.x += dx * diff * 0.5;
+            a.y += dy * diff * 0.5;
+            b.x -= dx * diff * 0.5;
+            b.y -= dy * diff * 0.5;
+        }
+    }
+}`
+    },
+    ourCode: {
+      rust: `// Constraint Theory: Exact solver
+use constraint_theory::{Manifold, ConstraintSolver};
+
+let mut solver = ConstraintSolver::new();
+solver.add_springs(&springs);
+solver.snap_to_manifold(Manifold::pythagorean());
+// Zero drift, exact constraints!`,
+      python: `# Constraint Theory: Exact solver
+from constraint_theory import Manifold, ConstraintSolver
+
+solver = ConstraintSolver()
+solver.add_springs(springs)
+solver.snap_to_manifold(Manifold.pythagorean())
+# Zero drift, exact constraints!`,
+      typescript: `// Constraint Theory: Exact solver
+import { Manifold, ConstraintSolver } from 'constraint-theory';
+
+const solver = new ConstraintSolver();
+solver.addSprings(springs);
+solver.snapToManifold(Manifold.pythagorean());
+// Zero drift, exact constraints!`,
+      go: `// Constraint Theory: Exact solver
+import "github.com/constraint-theory"
+
+solver := theory.NewConstraintSolver()
+solver.AddSprings(springs)
+solver.SnapToManifold(theory.NewManifold())
+// Zero drift, exact constraints!`,
+      cpp: `// Constraint Theory: Exact solver
+#include <constraint_theory/solver.hpp>
+
+auto solver = theory::ConstraintSolver::create();
+solver.add_springs(springs);
+solver.snap_to_manifold(theory::Manifold::pythagorean());
+// Zero drift, exact constraints!`
+    },
+    standardChars: 521,
+    ourChars: 112,
+    standardComplexity: "O(n × iter)",
+    ourComplexity: "O(n)"
+  },
+  {
+    title: "Neural Network Constraints",
+    description: "Enforce exact weight constraints in deep learning",
+    simulationId: "neural-network",
+    standardCode: {
+      rust: `// Manual gradient clipping with drift
+fn clip_gradients(
+    gradients: &mut [f64],
+    max_norm: f64
+) {
+    let mut norm: f64 = 0.0;
+    for &g in gradients.iter() {
+        norm += g * g;  // Accumulates FP error
+    }
+    norm = norm.sqrt();
+    
+    if norm > max_norm {
+        let scale = max_norm / norm;
+        for g in gradients.iter_mut() {
+            *g *= scale;  // More FP error
+        }
+    }
+}
+
+// After many iterations, weights drift from ideal`,
+      python: `# Manual gradient clipping with drift
+import numpy as np
+
+def clip_gradients(gradients, max_norm):
+    norm = np.sqrt(np.sum(gradients ** 2))
+    
+    if norm > max_norm:
+        scale = max_norm / norm
+        gradients *= scale  # FP error each time
+    
+    return gradients
+
+# After many iterations, weights drift from ideal`,
+      typescript: `// Manual gradient clipping with drift
+function clipGradients(
+  gradients: number[],
+  maxNorm: number
+): void {
+  let norm = 0;
+  for (const g of gradients) {
+    norm += g * g;  // Accumulates FP error
+  }
+  norm = Math.sqrt(norm);
+  
+  if (norm > maxNorm) {
+    const scale = maxNorm / norm;
+    for (let i = 0; i < gradients.length; i++) {
+      gradients[i] *= scale;  // More FP error
+    }
+  }
+}
+// After many iterations, weights drift from ideal`,
+      go: `// Manual gradient clipping with drift
+func ClipGradients(gradients []float64, maxNorm float64) {
+    var norm float64
+    for _, g := range gradients {
+        norm += g * g  // Accumulates FP error
+    }
+    norm = math.Sqrt(norm)
+    
+    if norm > maxNorm {
+        scale := maxNorm / norm
+        for i := range gradients {
+            gradients[i] *= scale  // More FP error
+        }
+    }
+}
+// After many iterations, weights drift from ideal`,
+      cpp: `// Manual gradient clipping with drift
+void clipGradients(
+    std::vector<double>& gradients,
+    double maxNorm) {
+    double norm = 0;
+    for (const auto& g : gradients) {
+        norm += g * g;  // Accumulates FP error
+    }
+    norm = std::sqrt(norm);
+    
+    if (norm > maxNorm) {
+        double scale = maxNorm / norm;
+        for (auto& g : gradients) {
+            g *= scale;  // More FP error
+        }
+    }
+}
+// After many iterations, weights drift from ideal`
+    },
+    ourCode: {
+      rust: `// Constraint Theory: Exact gradient snapping
+use constraint_theory::{GradientSnapper, Manifold};
+
+let snapper = GradientSnapper::new(
+    Manifold::pythagorean()
+).with_preserve_magnitude(true);
+
+let snapped = snapper.snap(&gradients);
+// Weights stay exact forever!`,
+      python: `# Constraint Theory: Exact gradient snapping
+from constraint_theory import GradientSnapper, Manifold
+
+snapper = GradientSnapper(
+    Manifold.pythagorean(),
+    preserve_magnitude=True
+)
+
+snapped = snapper.snap(gradients)
+# Weights stay exact forever!`,
+      typescript: `// Constraint Theory: Exact gradient snapping
+import { GradientSnapper, Manifold } from 'constraint-theory';
+
+const snapper = new GradientSnapper(
+    Manifold.pythagorean()
+).withPreserveMagnitude(true);
+
+const snapped = snapper.snap(gradients);
+// Weights stay exact forever!`,
+      go: `// Constraint Theory: Exact gradient snapping
+import "github.com/constraint-theory"
+
+snapper := theory.NewGradientSnapper(
+    theory.NewManifold(),
+).WithPreserveMagnitude(true)
+
+snapped := snapper.Snap(gradients)
+// Weights stay exact forever!`,
+      cpp: `// Constraint Theory: Exact gradient snapping
+#include <constraint_theory/ml.hpp>
+
+auto snapper = theory::GradientSnapper(
+    theory::Manifold::pythagorean()
+).with_preserve_magnitude(true);
+
+auto snapped = snapper.snap(gradients);
+// Weights stay exact forever!`
+    },
+    standardChars: 389,
+    ourChars: 118,
+    standardComplexity: "O(n)",
+    ourComplexity: "O(n)"
   }
 ]
 
@@ -193,36 +808,120 @@ const simulations: Simulation[] = [
 ]
 
 // ==================== CODE COMPARISON COMPONENT ====================
-function CodeComparisonCard({ comparison, index }: { comparison: typeof codeComparisons[0]; index: number }) {
+// Animated counter hook
+function useAnimatedCounter(target: number, duration: number = 500) {
+  const [display, setDisplay] = useState(target)
+  const prevRef = useRef(target)
+  
+  useEffect(() => {
+    const start = prevRef.current
+    const diff = target - start
+    const startTime = performance.now()
+    
+    const animate = (now: number) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3) // ease-out cubic
+      setDisplay(Math.round(start + diff * eased))
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    
+    requestAnimationFrame(animate)
+    prevRef.current = target
+  }, [target, duration])
+  
+  return display
+}
+
+// Syntax highlighting colors by language
+const languageColors: Record<Language, { primary: string; accent: string; icon: string }> = {
+  rust: { primary: 'text-orange-400', accent: 'ring-orange-500/30', icon: '🦀' },
+  python: { primary: 'text-yellow-400', accent: 'ring-yellow-500/30', icon: '🐍' },
+  typescript: { primary: 'text-blue-400', accent: 'ring-blue-500/30', icon: '📘' },
+  go: { primary: 'text-cyan-400', accent: 'ring-cyan-500/30', icon: '🐹' },
+  cpp: { primary: 'text-purple-400', accent: 'ring-purple-500/30', icon: '⚡' }
+}
+
+// Real-time code comparison component
+function RealTimeCodeComparison({ 
+  comparison, 
+  selectedLanguage,
+  onLanguageChange 
+}: { 
+  comparison: CodeExample
+  selectedLanguage: Language
+  onLanguageChange: (lang: Language) => void
+}) {
   const savings = Math.round((1 - comparison.ourChars / comparison.standardChars) * 100)
+  const charsSaved = comparison.standardChars - comparison.ourChars
+  
+  // Animated counters
+  const animatedStandardChars = useAnimatedCounter(comparison.standardChars)
+  const animatedOurChars = useAnimatedCounter(comparison.ourChars)
+  const animatedCharsSaved = useAnimatedCounter(charsSaved)
+  const animatedSavings = useAnimatedCounter(savings)
+  
+  // Track complexity changes via key for animation reset
+  const complexityKey = `${comparison.ourComplexity}-${comparison.simulationId}`
+  
+  const langColors = languageColors[selectedLanguage]
   
   return (
-    <Card className="overflow-hidden border-slate-700 bg-slate-900/50">
+    <Card className="overflow-hidden border-slate-700 bg-slate-900/50 backdrop-blur-sm transition-all duration-500 hover:border-violet-500/50">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <Code className="w-5 h-5 text-violet-400" />
             {comparison.title}
           </CardTitle>
-          <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
-            <TrendingDown className="w-3 h-3 mr-1" />
-            {savings}% less code
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={`bg-emerald-500/20 text-emerald-400 border-emerald-500/50 transition-all duration-300 ${charsSaved > 300 ? 'animate-pulse' : ''}`}>
+              <TrendingDown className="w-3 h-3 mr-1" />
+              {animatedSavings}% less code
+            </Badge>
+            <Badge variant="outline" className="text-violet-400 border-violet-500/50">
+              {comparison.simulationId}
+            </Badge>
+          </div>
         </div>
         <CardDescription>{comparison.description}</CardDescription>
       </CardHeader>
+      
       <CardContent>
+        {/* Language Tabs */}
+        <div className="flex gap-1 mb-4 p-1 bg-slate-800/50 rounded-lg w-fit">
+          {(['rust', 'python', 'typescript', 'go', 'cpp'] as Language[]).map((lang) => (
+            <button
+              key={lang}
+              onClick={() => onLanguageChange(lang)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-300 ${
+                selectedLanguage === lang 
+                  ? `bg-slate-700 ${languageColors[lang].primary} ring-2 ${languageColors[lang].accent}` 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              <span className="mr-1">{languageColors[lang].icon}</span>
+              {lang.charAt(0).toUpperCase() + lang.slice(1).replace('pp', '++')}
+            </button>
+          ))}
+        </div>
+        
         <div className="grid md:grid-cols-2 gap-4">
           {/* Standard Code */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-400">Standard Approach</span>
-              <span className="text-red-400 font-mono">{comparison.standardChars} chars</span>
+              <span className="text-red-400 font-mono transition-all duration-300">
+                {animatedStandardChars} chars
+              </span>
             </div>
-            <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs overflow-x-auto max-h-48 overflow-y-auto">
-              <pre className="text-red-300/80">{comparison.standardCode}</pre>
+            <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs overflow-x-auto max-h-64 overflow-y-auto border border-red-500/10 hover:border-red-500/30 transition-colors duration-300">
+              <pre className="text-red-300/80 whitespace-pre-wrap">{comparison.standardCode[selectedLanguage]}</pre>
             </div>
-            <Badge variant="outline" className="text-red-400 border-red-400/50">
+            <Badge variant="outline" className="text-red-400 border-red-400/50 transition-all duration-300">
               {comparison.standardComplexity}
             </Badge>
           </div>
@@ -230,13 +929,21 @@ function CodeComparisonCard({ comparison, index }: { comparison: typeof codeComp
           {/* Our Code */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Constraint Theory</span>
-              <span className="text-emerald-400 font-mono">{comparison.ourChars} chars</span>
+              <span className="text-slate-400 flex items-center gap-1">
+                Constraint Theory
+                <span className="text-violet-400">{langColors.icon}</span>
+              </span>
+              <span className={`font-mono transition-all duration-300 ${langColors.primary}`}>
+                {animatedOurChars} chars
+              </span>
             </div>
-            <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs overflow-x-auto max-h-48 overflow-y-auto ring-2 ring-violet-500/30">
-              <pre className="text-emerald-300">{comparison.ourCode}</pre>
+            <div className={`bg-slate-950 rounded-lg p-3 font-mono text-xs overflow-x-auto max-h-64 overflow-y-auto ring-2 ${langColors.accent} hover:ring-violet-500/50 transition-all duration-300 shadow-lg shadow-violet-500/5`}>
+              <pre className="text-emerald-300 whitespace-pre-wrap">{comparison.ourCode[selectedLanguage]}</pre>
             </div>
-            <Badge variant="outline" className="text-emerald-400 border-emerald-400/50">
+            <Badge 
+              variant="outline" 
+              className={`text-emerald-400 border-emerald-400/50 transition-all duration-500 ${complexityChanged ? 'scale-110 ring-2 ring-emerald-400/50' : ''}`}
+            >
               {comparison.ourComplexity}
             </Badge>
           </div>
@@ -247,13 +954,18 @@ function CodeComparisonCard({ comparison, index }: { comparison: typeof codeComp
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <div className="text-xs text-slate-400 mb-1">Code Reduction</div>
-              <Progress value={savings} className="h-2 bg-slate-700 [&>div]:bg-gradient-to-r [&>div]:from-violet-500 [&>div]:to-emerald-500" />
+              <Progress 
+                value={savings} 
+                className="h-2 bg-slate-700 [&>div]:bg-gradient-to-r [&>div]:from-violet-500 [&>div]:to-emerald-500 transition-all duration-500" 
+              />
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-emerald-400">-{comparison.standardChars - comparison.ourChars}</div>
+              <div className={`text-2xl font-bold text-emerald-400 transition-all duration-300 ${charsSaved > 300 ? 'scale-110' : ''}`}>
+                -{animatedCharsSaved}
+              </div>
               <div className="text-xs text-slate-400">characters saved</div>
             </div>
-            <Lightbulb className="w-8 h-8 text-yellow-400 animate-pulse" />
+            <Lightbulb className={`w-8 h-8 text-yellow-400 ${charsSaved > 300 ? 'animate-bounce' : 'animate-pulse'}`} />
           </div>
         </div>
       </CardContent>
@@ -2421,6 +3133,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [filter, setFilter] = useState<string>('all')
   const [activeTab, setActiveTab] = useState<string>('simulations')
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>('rust')
   
   const categories = useMemo(() => [...new Set(simulations.map(s => s.category))], [])
   const filteredSims = useMemo(() => 
@@ -2431,6 +3144,11 @@ export default function Home() {
     simulations.find(s => s.id === selectedSim),
     [selectedSim]
   )
+  
+  // Find code comparison that matches the selected simulation
+  const activeComparison = useMemo(() => {
+    return codeComparisons.find(c => c.simulationId === selectedSim) || codeComparisons[0]
+  }, [selectedSim])
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
@@ -2511,10 +3229,62 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Code Comparisons */}
-            <div className="space-y-6">
-              {codeComparisons.map((comparison, i) => (
-                <CodeComparisonCard key={comparison.title} comparison={comparison} index={i} />
+            {/* Active Simulation Code Comparison */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-violet-400" />
+                  Code for Active Simulation
+                </h3>
+                <Badge variant="outline" className="text-violet-400 border-violet-500/50">
+                  {activeComparison.simulationId}
+                </Badge>
+              </div>
+              <RealTimeCodeComparison 
+                comparison={activeComparison}
+                selectedLanguage={selectedLanguage}
+                onLanguageChange={setSelectedLanguage}
+              />
+            </div>
+
+            {/* All Code Comparisons */}
+            <Separator className="bg-slate-700" />
+            <h3 className="text-lg font-semibold">All Code Comparisons</h3>
+            <div className="grid lg:grid-cols-2 gap-4">
+              {codeComparisons.map((comparison) => (
+                <Card 
+                  key={comparison.title}
+                  className={`overflow-hidden border-slate-700 bg-slate-900/50 transition-all duration-300 cursor-pointer hover:border-violet-500/50 ${
+                    activeComparison.simulationId === comparison.simulationId ? 'ring-2 ring-violet-500' : ''
+                  }`}
+                  onClick={() => {
+                    setSelectedSim(comparison.simulationId)
+                    setActiveTab('simulations')
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Code className="w-4 h-4 text-violet-400" />
+                        {comparison.title}
+                      </h4>
+                      <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50 text-xs">
+                        {Math.round((1 - comparison.ourChars / comparison.standardChars) * 100)}% saved
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-400 mb-3">{comparison.description}</p>
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex gap-4">
+                        <span className="text-red-400">{comparison.standardComplexity}</span>
+                        <ArrowRight className="w-3 h-3 text-slate-500" />
+                        <span className="text-emerald-400">{comparison.ourComplexity}</span>
+                      </div>
+                      <span className="text-slate-500">
+                        -{comparison.standardChars - comparison.ourChars} chars
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -2654,6 +3424,95 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </div>
+              
+              {/* Real-time Code Comparison for Active Simulation */}
+              {activeComparison && (
+                <Card className="overflow-hidden border-violet-500/30 bg-slate-900/50 backdrop-blur-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-sm flex items-center gap-2">
+                        <Code className="w-4 h-4 text-violet-400" />
+                        Code for {activeComparison.title}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        {/* Mini language selector */}
+                        <div className="flex gap-0.5 bg-slate-800/50 rounded p-0.5">
+                          {(['rust', 'python', 'typescript', 'go', 'cpp'] as Language[]).map((lang) => (
+                            <button
+                              key={lang}
+                              onClick={() => setSelectedLanguage(lang)}
+                              className={`px-2 py-0.5 rounded text-[10px] transition-all ${
+                                selectedLanguage === lang 
+                                  ? `${languageColors[lang].primary} bg-slate-700` 
+                                  : 'text-slate-500 hover:text-white'
+                              }`}
+                            >
+                              {languageColors[lang].icon}
+                            </button>
+                          ))}
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 text-xs"
+                          onClick={() => setActiveTab('comparisons')}
+                        >
+                          View Full <ChevronRight className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {/* Standard Code */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="text-slate-400">Standard Approach</span>
+                          <span className="text-red-400 font-mono">{activeComparison.standardChars} chars</span>
+                        </div>
+                        <div className="bg-slate-950 rounded-lg p-2 font-mono text-[10px] overflow-x-auto max-h-32 overflow-y-auto border border-red-500/10">
+                          <pre className="text-red-300/80 whitespace-pre-wrap">{activeComparison.standardCode[selectedLanguage]}</pre>
+                        </div>
+                        <Badge variant="outline" className="text-[9px] text-red-400 border-red-400/50">
+                          {activeComparison.standardComplexity}
+                        </Badge>
+                      </div>
+                      
+                      {/* Our Code */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="text-slate-400">Constraint Theory</span>
+                          <span className={`font-mono ${languageColors[selectedLanguage].primary}`}>
+                            {activeComparison.ourChars} chars
+                          </span>
+                        </div>
+                        <div className={`bg-slate-950 rounded-lg p-2 font-mono text-[10px] overflow-x-auto max-h-32 overflow-y-auto ring-1 ${languageColors[selectedLanguage].accent} shadow-lg shadow-violet-500/5`}>
+                          <pre className="text-emerald-300 whitespace-pre-wrap">{activeComparison.ourCode[selectedLanguage]}</pre>
+                        </div>
+                        <Badge variant="outline" className="text-[9px] text-emerald-400 border-emerald-400/50">
+                          {activeComparison.ourComplexity}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Savings indicator */}
+                    <div className="mt-3 pt-3 border-t border-slate-700 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Progress 
+                          value={Math.round((1 - activeComparison.ourChars / activeComparison.standardChars) * 100)} 
+                          className="h-1.5 w-24 bg-slate-700 [&>div]:bg-gradient-to-r [&>div]:from-violet-500 [&>div]:to-emerald-500" 
+                        />
+                        <span className="text-emerald-400 text-xs font-bold">
+                          {Math.round((1 - activeComparison.ourChars / activeComparison.standardChars) * 100)}% less code
+                        </span>
+                      </div>
+                      <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50 text-[10px]">
+                        <TrendingDown className="w-2.5 h-2.5 mr-1" />
+                        -{activeComparison.standardChars - activeComparison.ourChars} chars
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         )}

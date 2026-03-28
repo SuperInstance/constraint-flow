@@ -485,3 +485,23 @@ You can learn more, including how to opt-out if you'd not like to participate in
 https://nextjs.org/telemetry
 
 [?25h
+==========================================
+[2026-03-28 06:31:49] Starting: bun install
+==========================================
+[BUN] Installing dependencies...
+[0.04ms] ".env"
+bun install v1.3.10 (30e609e0)
+
+Checked 846 installs across 915 packages (no changes) [41.00ms]
+==========================================
+[2026-03-28 06:31:50] Completed: bun install
+[LOG] Step: bun install | Duration: 0s
+==========================================
+
+==========================================
+[2026-03-28 06:31:50] Starting: bun run db:push
+==========================================
+[BUN] Setting up database...
+$ prisma db push
+Failed to load config file "/home/z/my-project" as a TypeScript/JavaScript module. Error: Error: ENOTDIR: not a directory, lstat '/home/z/my-project/.config/prisma'
+error: script "db:push" exited with code 1

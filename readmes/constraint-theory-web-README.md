@@ -2,7 +2,7 @@
 
 > **See the math click. 49 interactive simulations that make geometry intuitive.**
 
-🌐 **Live Demo:** [constraint-theory.superinstance.ai](https://constraint-theory.superinstance.ai)
+🌐 **Live Demo:** [constraint-theory-web.pages.dev](https://constraint-theory-web.pages.dev)
 
 [![GitHub stars](https://img.shields.io/github/stars/SuperInstance/constraint-theory-web?style=social)](https://github.com/SuperInstance/constraint-theory-web)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -41,7 +41,7 @@ cd constraint-theory-web
 open simulators/pythagorean/index.html
 ```
 
-**Or try online:** [constraint-theory.superinstance.ai](https://constraint-theory.superinstance.ai)
+**Or try online:** [constraint-theory-web.pages.dev](https://constraint-theory-web.pages.dev)
 
 ---
 
@@ -65,9 +65,9 @@ Click anywhere on the canvas. Watch your cursor snap to the nearest exact coordi
 
 | Demo | What You'll Learn | Try It |
 |------|-------------------|--------|
-| **Pythagorean Snapping** | Click to snap — see noise in real-time | [Live](https://constraint-theory.superinstance.ai/simulators/pythagorean/) |
-| **KD-Tree Visualization** | Watch O(log n) in action | [Live](https://constraint-theory.superinstance.ai/simulators/kdtree/) |
-| **Swarm Behavior** | Boids with deterministic physics | [Live](https://constraint-theory.superinstance.ai/simulators/swarm/) |
+| **Pythagorean Snapping** | Click to snap — see noise in real-time | [Live](https://constraint-theory-web.pages.dev/simulators/pythagorean/) |
+| **KD-Tree Visualization** | Watch O(log n) in action | [Live](https://constraint-theory-web.pages.dev/simulators/kdtree/) |
+| **Swarm Behavior** | Boids with deterministic physics | [Live](https://constraint-theory-web.pages.dev/simulators/swarm/) |
 
 ### 🔬 Mathematical Visualizations (20+)
 
@@ -295,6 +295,6 @@ MIT — see [LICENSE](LICENSE).
 
 **If you've ever struggled to explain a mathematical concept, an interactive demo does the teaching for you.**
 
-**[Star this repo](https://github.com/SuperInstance/constraint-theory-web)** · **[Try the demos](https://constraint-theory.superinstance.ai)**
+**[Star this repo](https://github.com/SuperInstance/constraint-theory-web)** · **[Try the demos](https://constraint-theory-web.pages.dev)**
 
 </div>
