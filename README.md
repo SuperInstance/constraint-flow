@@ -388,14 +388,15 @@ constraint-flow deploy --provider=azure
 
 ## 🌟 Ecosystem
 
-| Repo | What It Does |
-|------|--------------|
-| **[constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core)** | Rust crate - exact arithmetic, Pythagorean snapping, deterministic geometry |
-| **[constraint-theory-python](https://github.com/SuperInstance/constraint-theory-python)** | Python bindings - PyTorch integration, ML quantization |
-| **[constraint-ranch](https://github.com/SuperInstance/constraint-ranch)** | Gamified AI training - puzzle-based agent coordination |
-| **[constraint-flow](https://github.com/SuperInstance/constraint-flow)** | This repo - Enterprise workflow automation with exact guarantees |
-| **[constraint-theory-web](https://github.com/SuperInstance/constraint-theory-web)** | Interactive demos - 49 visual experiments |
-| **[constraint-theory-research](https://github.com/SuperInstance/constraint-theory-research)** | Research papers - mathematical foundations |
+| Repo | What It Does | Key Features |
+|------|--------------|--------------|
+| **[constraint-theory-core](https://github.com/SuperInstance/constraint-theory-core)** | 🦀 Rust crate | ~100ns snap, SIMD batch, 82 tests |
+| **[constraint-theory-python](https://github.com/SuperInstance/constraint-theory-python)** | 🐍 Python bindings | NumPy integration, PyTorch compatible |
+| **[constraint-theory-web](https://github.com/SuperInstance/constraint-theory-web)** | 🌐 Interactive demos | 50 visualizations, zero setup |
+| **[constraint-theory-research](https://github.com/SuperInstance/constraint-theory-research)** | 📚 Mathematical foundations | arXiv paper, proofs, open problems |
+| **[constraint-ranch](https://github.com/SuperInstance/constraint-ranch)** | 🎮 Gamified learning | Puzzle games, agent breeding |
+| **[constraint-flow](https://github.com/SuperInstance/constraint-flow)** | 💼 This repo | Exact financial calculations, workflow orchestration |
+| **[constraint-theory-agent](https://github.com/SuperInstance/constraint-theory-agent)** | 🤖 Implementation agent | Code audit, refactoring, expert explanations |
 
 ### Ecosystem Integration
 

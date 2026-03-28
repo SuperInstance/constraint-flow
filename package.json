@@ -1,0 +1,43 @@
+{
+  "name": "constraint-flow",
+  "version": "1.0.0",
+  "description": "Workflow automation library with exact arithmetic - deterministic, reproducible workflows for enterprise",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/ connectors/ templates/ --ext .ts",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "constraint-theory",
+    "workflow",
+    "automation",
+    "exact-arithmetic",
+    "enterprise",
+    "deterministic"
+  ],
+  "author": "SuperInstance Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperInstance/constraint-flow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SuperInstance/constraint-flow/issues"
+  },
+  "homepage": "https://constraint-theory.superinstance.ai/flow",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
